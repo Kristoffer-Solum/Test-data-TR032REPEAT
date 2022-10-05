@@ -8,9 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 
 library(readxl)
-dataset <- read_excel("DATA/")
-View(dataset)
-
+langtidstest_pilot_data <- read_excel("DATA/langtidstest_pilot_data.xlsx")
+View(langtidstest_pilot_data)
 
 ```
 
