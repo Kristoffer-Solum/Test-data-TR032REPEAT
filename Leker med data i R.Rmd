@@ -15,11 +15,12 @@ View(langtidstest_pilot_data)
 
 ```{r}
 dat <- langtidstest_pilot_data %>% 
-  select(id, period, group, w.2mmol, w.4mmol, w.max, vo2.max, w.15tt) %>% 
+  select(id, period, timepoint, group, w.2mmol, w.4mmol, w.max, vo2.max, w.15tt) %>% 
   print()
   
   pivot_wider(names_from = group,
-              values_from = w.2mmol) %>%
+              values_from = w.2mmol) %>% 
+  print()
   
   
   
@@ -28,22 +29,5 @@ dat <- langtidstest_pilot_data %>%
 
 
 
-```{r}
-library(tidyverse)
-dat <- dxadata %>%  # endre tabellen for å gjøre utregninger
-  select(participant:include, lean.left_leg, lean.right_leg) %>%
-  pivot_longer(names_to = "leg", 
-               values_to = "lean.mass", 
-               cols = lean.left_leg:lean.right_leg) %>%
-  mutate(leg = if_else(leg == "lean.left_leg", "L", "R"), 
-         sets = if_else(multiple == leg, "multiple", "single")) %>%
-  select(participant, time, sets, sex, leg, lean.mass) %>%
-  
-  pivot_wider(names_from = time, # Regner ut prosentvis endring
-              values_from = lean.mass) %>%
-  mutate(lbm.change = post - pre) %>%
-  mutate(pre.mc = pre - mean(pre)) %>% 
-  mutate(prosentvis.endring = ((post - pre) / pre) * 100) %>%
-  filter(!is.na(lbm.change)) 
-```
+
 
