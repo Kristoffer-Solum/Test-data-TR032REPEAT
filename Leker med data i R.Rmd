@@ -14,18 +14,38 @@ View(langtidstest_pilot_data)
 
 
 ```{r}
-dat <- langtidstest_pilot_data %>% 
-  select(id, period, timepoint, group, w.2mmol, w.4mmol, w.max, vo2.max, w.15tt) %>% 
+dat <- langtidstest_pilot_data %>%
+  select(id, period, group, w.2mmol, w.4mmol, w.max, vo2.max, w.15tt) %>% 
+ print()
+
+dat_formert <- dat %>%
+pivot_wider(names_from = group,
+              values_from = c(w.2mmol, w.4mmol, w.max, vo2.max, w.15tt)) %>% 
   print()
   
-  pivot_wider(names_from = group,
-              values_from = w.2mmol) %>% 
-  print()
+dat_endring <- dat_formert %>%
+  mutate(endring_w.2mmol = w.2mmol_bolk - w.2mmol_pre) %>%
+  mutate(w.2mmol_pre.mc = w.2mmol_pre - mean(w.2mmol_pre)) %>%
+  mutate(prosentvis.endring_w.2mmol = ((w.2mmol_bolk - w.2mmol_pre) / w.2mmol_pre) * 100) %>%
+  filter(!is.na(endring_w.2mmol)) %>%
+print()
+
+
   
   
   
 
 ```
+```{r}
+pivot_wider(names_from = time, # Regner ut prosentvis endring
+              values_from = lean.mass) %>%
+  mutate(lbm.change = post - pre) %>%
+  mutate(pre.mc = pre - mean(pre)) %>% 
+  mutate(prosentvis.endring = ((post - pre) / pre) * 100) %>%
+  filter(!is.na(lbm.change)) 
+
+```
+
 
 
 
