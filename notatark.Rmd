@@ -1,0 +1,79 @@
+---
+title: "notat ark"
+author: "Kristoffer Solum"
+date: "16 11 2022"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE, results="hide"}
+remotes::install_github("dhammarstrom/exscidata")
+
+library(tidyverse)
+library(exscidata) # lastet inn data
+data("dxadata") 
+data("strengthvolume")
+
+strengthvolume %>%
+  filter(exercise == "legext", time %in% c("pre", "post")) %>%
+  group_by(sets, time) %>%
+  summarise(m = mean(load, na.rm = TRUE), 
+            s = sd(load, na.rm = TRUE)) %>%
+  mutate(time = factor(time, levels = c("pre", "post"), labels = c("Pre-training", "Post-training")), 
+         sets = factor(sets, levels = c("single", "multiple"), labels = c("Single-set", "Multiple-set"))) %>%
+  ggplot(aes(time, m, color = sets)) + 
+  
+  geom_errorbar(aes(ymin = m - s, ymax = m + s), 
+                position = position_dodge(width = 0.2), 
+                width = 0.2) +
+  geom_point(position = position_dodge(width = 0.2)) +
+  
+  labs(x = "Time-point", 
+       y = "Average load (kg)", 
+       color = "Sets") +
+  
+  theme_bw() + 
+  
+  theme(legend.position = c(0.1, 0.9))
+```
+
+```{r Prosentvis økning figur styrke, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE, results="hide"}
+styrke.gjennomsnitt <- styrke1 %>%
+  group_by(sets) %>%
+  summarise(m = mean(prosentvis.endring, na.rm = TRUE),
+            sd = sd(prosentvis.endring, na.rm = TRUE)) %>%
+  print()
+
+styrke.gjennomsnitt %>%
+  
+ggplot(aes(sets, m)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = m + sd, ymin = m - sd, width = 0.2), color = "black") + geom_line(data = styrke1, aes(sets, prosentvis.endring, group = participant), alpha = 2, color = "green") +
+
+labs(x = "Gruppe",
+     y = "Prosentvis endring")
+  
+  
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include=False, results="hide", fig.cap = "Figur 2 viser endring i muskelstyrke for alle forsøkspersonene fra pre- post skildt ved single- sett og multiple- sett"}
+
+styrkemodell <- strengthvolume %>% # endre tabellen for å gjøre utregninger
+  group_by(exercise) %>%
+  mutate(scaled.load = load / max(load, na.rm = TRUE)) %>%
+  group_by(participant, time, sex, sets) %>%
+  summarise(combined.load = mean(scaled.load, na.rm = TRUE)) %>%
+  ungroup() 
+
+styrkemodell %>% # Lager en figur pre- post per gruppe
+  filter(!is.na(combined.load), time == factor(time, levels = c("pre", "post"))) %>%
+  mutate(time = factor(time, levels = c("pre", "post")),
+         group = factor(sets, levels = c("single", "multiple"))) %>%
+ ggplot(aes(time, combined.load, group = paste(participant, sets), color = sets)) + geom_line() + theme_minimal() 
+```

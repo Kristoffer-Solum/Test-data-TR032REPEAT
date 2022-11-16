@@ -26,14 +26,10 @@ pivot_wider(names_from = group,
 dat_endring <- dat_formert %>%
   mutate(endring_w.2mmol = w.2mmol_bolk - w.2mmol_pre) %>%
   mutate(w.2mmol_pre.mc = w.2mmol_pre - mean(w.2mmol_pre)) %>%
-  mutate(prosentvis.endring_w.2mmol = ((w.2mmol_bolk - w.2mmol_pre) / w.2mmol_pre) * 100) %>%
+  mutate(prosentvis.endring_w.2mmol_bolk = ((w.2mmol_bolk - w.2mmol_pre) / w.2mmol_pre) * 100) %>%
   filter(!is.na(endring_w.2mmol)) %>%
 print()
 
-
-  
-  
-  
 
 ```
 ```{r}
@@ -47,7 +43,54 @@ pivot_wider(names_from = time, # Regner ut prosentvis endring
 ```
 
 
+```{r}
+# prøvedata fra daniel
+danieldat <- data.frame(subject = rep(seq(1:25), 2),
+                        change = c(rnorm(25, 0, 10),
+                                   rnorm(25, 10, 20)),
+                        cond = rep(c("A", "B"), each = 25)) %>% 
+print()
+ 
+danieldat %>%
+  ggplot(aes(cond, change, group =subject)) + geom_line()
 
+```
+
+
+
+```{r}
+dat_endring %>% # endring score mellom mit1 og mit2 i absolutte verdier
+  ggplot(aes(period, group = id, endring_w.2mmol)) + geom_line()
+
+```
+
+```{r}
+# endring mellom pre og bolk i hver periode
+
+
+dat %>% #MIT1
+  filter(period!="MIT2") %>%
+  filter(!is.na(w.max), group == factor(group, levels = c("pre", "bolk"))) %>%
+ mutate(group = factor(group, levels = c("pre", "bolk"))) %>%
+          
+         
+ ggplot(aes(group, w.max, group = id)) + geom_line() + theme_minimal()  
+
+
+dat %>% #MIT2
+  filter(period!="MIT1") %>%
+  filter(!is.na(w.max), group == factor(group, levels = c("pre", "bolk"))) %>%
+ mutate(group = factor(group, levels = c("pre", "bolk"))) %>%
+          
+         
+ ggplot(aes(group, w.max, group = id)) + geom_line() + theme_minimal()  
+
+
+
+
+  
+
+```
 
 
 
